@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTodolistContext } from "../hooks/useTodolistsContext";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const TodolistForm = () => {
   const [title, setTitle] = useState("");
@@ -7,10 +8,15 @@ const TodolistForm = () => {
   const [error, setError] = useState(null);
   const [emptyFields, setEmptyFields] = useState([]);
   const { dispatch } = useTodolistContext();
+  const { user } = useAuthContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!user) {
+      setError("You must be logged in");
+      return;
+    }
     const todolist = { title, description };
 
     const response = await fetch("/api/todolists", {
@@ -18,6 +24,7 @@ const TodolistForm = () => {
       body: JSON.stringify(todolist),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
       },
     });
     const json = await response.json();

@@ -2,19 +2,22 @@ import React from "react";
 // date fns
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import { useTodolistContext } from "../hooks/useTodolistsContext";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const TodolistDetails = ({ todolist }) => {
   const { dispatch } = useTodolistContext();
+  const { user } = useAuthContext();
+
   const handleClick = async () => {
-    // if (!user) {
-    //   return
-    // }
+    if (!user) {
+      return
+    }
 
     const response = await fetch("/api/todolists/" + todolist._id, {
       method: "DELETE",
-      // headers: {
-      //   'Authorization': `Bearer ${user.token}`
-      // }
+      headers: {
+        'Authorization': `Bearer ${user.token}`
+      }
     });
     const json = await response.json();
 

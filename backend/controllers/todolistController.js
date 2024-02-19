@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 
 // Get all todolists
 const getTodolists = async (req, res) => {
-  const todolists = await Todolist.find({}).sort({ createAt: -1 });
+  const user_id = req.user._id;
+
+  const todolists = await Todolist.find({user_id}).sort({ createAt: -1 });
   res.status(200).json(todolists);
 };
 
@@ -24,6 +26,7 @@ const getTodolist = async (req, res) => {
 
 // create a todolists
 const createTodolist = async (req, res) => {
+
   const { title, description } = req.body;
 
   let emptyFields = [];
@@ -36,11 +39,15 @@ const createTodolist = async (req, res) => {
     emptyFields.push("description");
   }
   if (emptyFields.length > 0) {
-    return res.status(400).json({ error: "Please fill tin all the fields", emptyFields });
+    return res
+      .status(400)
+      .json({ error: "Please fill tin all the fields", emptyFields });
   }
   //   add doc to db
   try {
-    const todolist = await Todolist.create({ title, description });
+    const user_id = req.user._id;
+    console.log(user_id, req.user._id, title,req.user, "user_id");
+    const todolist = await Todolist.create({ title, description, user_id });
     res.status(200).json(todolist);
   } catch (error) {
     res.status(400).json({ error: error.message });

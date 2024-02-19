@@ -2,16 +2,17 @@ import { useEffect } from "react";
 import TodolistDetails from "../components/TodolistDetails";
 import TodolistForm from "../components/TodolistForm";
 import { useTodolistContext } from "../hooks/useTodolistsContext";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const Home = () => {
   const { todolists, dispatch } = useTodolistContext();
-
+  const { user } = useAuthContext();
   useEffect(() => {
     const fetchTodolists = async () => {
       const response = await fetch("/api/todolists", {
-        // headers: {
-        //   Authorization: `Bearer ${user.token}`,
-        // },
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
       });
       const json = await response.json();
 
@@ -19,10 +20,10 @@ const Home = () => {
         dispatch({ type: "SET_TODOLISTS", payload: json });
       }
     };
-    // if (user) {
-    fetchTodolists();
-    // }
-  }, [dispatch]);
+    if (user) {
+      fetchTodolists();
+    }
+  }, [dispatch, user]);
 
   return (
     <div className="home">
